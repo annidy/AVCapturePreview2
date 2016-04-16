@@ -1,3 +1,2 @@
-# AVCapturePreview
+# AVCapturePreview2
 
-![](https://raw.githubusercontent.com/annidy/AVCapturePreview/master/cap.png)
