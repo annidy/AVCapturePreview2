@@ -12,6 +12,7 @@
 		91C738C91CC22743003C6DC9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 91C738C81CC22743003C6DC9 /* Assets.xcassets */; };
 		91C738CC1CC22743003C6DC9 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 91C738CA1CC22743003C6DC9 /* MainMenu.xib */; };
 		91C738D91CC2283C003C6DC9 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 91C738D71CC2283C003C6DC9 /* ViewController.m */; };
+		91D49C9F1CD42FA7003F7426 /* VideoCIView.m in Sources */ = {isa = PBXBuildFile; fileRef = 91D49C9E1CD42FA7003F7426 /* VideoCIView.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,8 @@
 		91C738CD1CC22743003C6DC9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		91C738D61CC2283C003C6DC9 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ViewController.h; path = ../ViewController.h; sourceTree = "<group>"; };
 		91C738D71CC2283C003C6DC9 /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ViewController.m; path = ../ViewController.m; sourceTree = "<group>"; };
+		91D49C9E1CD42FA7003F7426 /* VideoCIView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoCIView.m; sourceTree = "<group>"; };
+		91D49CA01CD42FC4003F7426 /* VideoCIView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VideoCIView.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +63,8 @@
 				91C738C31CC22743003C6DC9 /* AppDelegate.m */,
 				91C738D61CC2283C003C6DC9 /* ViewController.h */,
 				91C738D71CC2283C003C6DC9 /* ViewController.m */,
+				91D49C9E1CD42FA7003F7426 /* VideoCIView.m */,
+				91D49CA01CD42FC4003F7426 /* VideoCIView.h */,
 				91C738C81CC22743003C6DC9 /* Assets.xcassets */,
 				91C738CA1CC22743003C6DC9 /* MainMenu.xib */,
 				91C738CD1CC22743003C6DC9 /* Info.plist */,
@@ -147,6 +152,7 @@
 			files = (
 				91C738D91CC2283C003C6DC9 /* ViewController.m in Sources */,
 				91C738C71CC22743003C6DC9 /* main.m in Sources */,
+				91D49C9F1CD42FA7003F7426 /* VideoCIView.m in Sources */,
 				91C738C41CC22743003C6DC9 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
