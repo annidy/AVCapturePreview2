@@ -9,21 +9,32 @@
 #import "ViewController.h"
 @import AVFoundation;
 
+//#define QUARTZ
+#define LAYER
+
 #include <assert.h>
 #include <CoreServices/CoreServices.h>
 #include <mach/mach.h>
 #include <mach/mach_time.h>
 #include <unistd.h>
 
+#import <OpenGL/gl3.h>
+
+
 @interface ViewController ()<AVCaptureVideoDataOutputSampleBufferDelegate>
 
 @property (weak) IBOutlet NSImageView *cameraView;
 @property (weak) IBOutlet NSTextField *fpsLabel;
+@property (weak) IBOutlet NSOpenGLView *openGLView;
 @end
 
 @implementation ViewController
 {
     AVCaptureSession *_captureSession;
+    
+    AVSampleBufferDisplayLayer *_videoLayer;
+    NSMutableArray *_displayFrameBuffer;
+    dispatch_queue_t _captureQueue;
 }
 
 - (void)viewDidLoad {
@@ -31,7 +42,7 @@
     [self.view setWantsLayer:YES];
     // Do any additional setup after loading the view.
     
-    
+    _captureQueue = dispatch_queue_create("AVCapture2", 0);
 }
 
 - (void)viewDidAppear
@@ -39,6 +50,10 @@
     [super viewDidAppear];
     
     [self initCaptureSession];
+    
+#ifdef LAYER
+    [self initSampleBufferDisplayLayer];
+#endif
 }
 
 - (void)setRepresentedObject:(id)representedObject {
@@ -80,17 +95,41 @@
     [dataOutput setAlwaysDiscardsLateVideoFrames:YES]; // Probably want to set this to NO when recording
     
     //-- Set to YUV420.
-    [dataOutput setVideoSettings:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_420YpCbCr8BiPlanarFullRange]
+    [dataOutput setVideoSettings:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange]
                                                              forKey:(id)kCVPixelBufferPixelFormatTypeKey]]; // Necessary for manual preview
     
     // Set dispatch to be on the main thread so OpenGL can do things with the data
-    [dataOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()];
+    [dataOutput setSampleBufferDelegate:self queue:_captureQueue];
     
     [_captureSession addOutput:dataOutput];
     
     [_captureSession commitConfiguration];
 
 }
+
+- (void)initSampleBufferDisplayLayer
+{
+    _videoLayer = [[AVSampleBufferDisplayLayer alloc] init];
+    [_videoLayer setFrame:(CGRect){.origin=CGPointZero, .size=self.cameraView.frame.size}];
+    _videoLayer.videoGravity = AVLayerVideoGravityResizeAspect;
+    _videoLayer.backgroundColor = CGColorGetConstantColor(kCGColorBlack);
+    _videoLayer.layoutManager  = [CAConstraintLayoutManager layoutManager];
+    _videoLayer.autoresizingMask = kCALayerHeightSizable | kCALayerWidthSizable;
+    _videoLayer.contentsGravity = kCAGravityResizeAspect;
+    /*
+    CMTimebaseRef controlTimebase;
+    CMTimebaseCreateWithMasterClock( CFAllocatorGetDefault(), CMClockGetHostTimeClock(), &controlTimebase );
+    
+    _videoLayer.controlTimebase = controlTimebase;
+    
+    // Set the timebase to the initial pts here
+    CMTimebaseSetTime(_videoLayer.controlTimebase, CMTimeMakeWithSeconds(CACurrentMediaTime(), 24));
+    CMTimebaseSetRate(_videoLayer.controlTimebase, 1.0);
+    */
+    [self.cameraView.layer addSublayer:_videoLayer];
+}
+
+
 /*
  
   http://stackoverflow.com/questions/8838481/kcvpixelformattype-420ypcbcr8biplanarfullrange-frame-to-uiimage-conversion
@@ -155,18 +194,24 @@
 didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
        fromConnection:(AVCaptureConnection *)connection
 {
-    CVImageBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
-    size_t width = CVPixelBufferGetWidth(pixelBuffer);
-    size_t height = CVPixelBufferGetHeight(pixelBuffer);
-//
-//    CIImage *ciImage = [[CIImage alloc] initWithCVImageBuffer:pixelBuffer];
-//    NSCIImageRep *rep = [NSCIImageRep imageRepWithCIImage:ciImage];
-//    NSImage *nsImage = [[NSImage alloc] initWithSize:rep.size];
-//    [nsImage addRepresentation:rep];
+    static CMFormatDescriptionRef desc;
+    if (!desc) {
+        desc = CMSampleBufferGetFormatDescription(sampleBuffer);
+        NSLog(@"%@", desc);
+    }
     
+#ifdef QUARTZ
     NSImage *nsImage = [self imageFromSampleBuffer:sampleBuffer];
     [self.cameraView performSelectorOnMainThread:@selector(setImage:) withObject:nsImage waitUntilDone:NO];
+#endif
     
+#ifdef LAYER
+    if (_videoLayer.readyForMoreMediaData) {
+        [_videoLayer enqueueSampleBuffer:sampleBuffer];
+    } else {
+        // drop frame
+    }
+#endif
     [self frameUpdate];
 }
 
@@ -210,4 +255,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     fps++;
     
 }
+
+
+
 @end

@@ -717,6 +717,10 @@
                             </button>
                         </subviews>
                     </customView>
+                    <openGLView useAuxiliaryDepthBufferStencil="NO" allowOffline="YES" id="TU4-lN-jKS">
+                        <rect key="frame" x="80" y="86" width="320" height="240"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    </openGLView>
                 </subviews>
             </view>
         </window>
