@@ -7,10 +7,11 @@
 //
 
 #import "ViewController.h"
+#import "VideoCIView.h"
 @import AVFoundation;
 
 //#define QUARTZ
-#define LAYER
+//#define LAYER
 
 #include <assert.h>
 #include <CoreServices/CoreServices.h>
@@ -25,7 +26,7 @@
 
 @property (weak) IBOutlet NSImageView *cameraView;
 @property (weak) IBOutlet NSTextField *fpsLabel;
-@property (weak) IBOutlet NSOpenGLView *openGLView;
+@property (weak) IBOutlet VideoCIView *openGLView;
 @end
 
 @implementation ViewController
@@ -95,9 +96,8 @@
     [dataOutput setAlwaysDiscardsLateVideoFrames:YES]; // Probably want to set this to NO when recording
     
     //-- Set to YUV420.
-    [dataOutput setVideoSettings:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange]
-                                                             forKey:(id)kCVPixelBufferPixelFormatTypeKey]]; // Necessary for manual preview
-    
+    [dataOutput setVideoSettings:@{(id)kCVPixelBufferPixelFormatTypeKey:[NSNumber numberWithInt:kCVPixelFormatType_32ARGB]}];
+     
     // Set dispatch to be on the main thread so OpenGL can do things with the data
     [dataOutput setSampleBufferDelegate:self queue:_captureQueue];
     
@@ -212,6 +212,10 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         // drop frame
     }
 #endif
+    CVImageBufferRef buffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    CIImage *img = [CIImage imageWithCVImageBuffer:buffer];
+//    [self.openGLView setImage:img];
+    
     [self frameUpdate];
 }
 
@@ -247,7 +251,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     elapsedNano = AbsoluteToNanoseconds( *(AbsoluteTime *) &elapsed );
     
     if (* (uint64_t *) &elapsedNano > 1000000000ULL) {
-        self.fpsLabel.stringValue = [NSString stringWithFormat:@"fps %d", fps];
+        [self.fpsLabel performSelectorOnMainThread:@selector(setStringValue:) withObject:[NSString stringWithFormat:@"fps %d", fps] waitUntilDone:NO];
         fps = 0;
         start = end;
     }

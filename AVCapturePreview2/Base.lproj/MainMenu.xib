@@ -717,9 +717,9 @@
                             </button>
                         </subviews>
                     </customView>
-                    <openGLView useAuxiliaryDepthBufferStencil="NO" allowOffline="YES" id="TU4-lN-jKS">
+                    <openGLView useAuxiliaryDepthBufferStencil="NO" allowOffline="YES" id="TU4-lN-jKS" customClass="VideoCIView">
                         <rect key="frame" x="80" y="86" width="320" height="240"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES"/>
                     </openGLView>
                 </subviews>
             </view>
@@ -728,6 +728,7 @@
             <connections>
                 <outlet property="cameraView" destination="jSi-zU-Wkm" id="gEi-GX-5NF"/>
                 <outlet property="fpsLabel" destination="9zv-lD-kIR" id="Z2l-bm-mT4"/>
+                <outlet property="openGLView" destination="TU4-lN-jKS" id="E4a-aZ-qJ7"/>
                 <outlet property="view" destination="EiT-Mj-1SZ" id="0h6-Ip-4Z5"/>
             </connections>
         </viewController>
