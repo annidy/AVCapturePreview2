@@ -51,16 +51,12 @@
 
 
 #import <Cocoa/Cocoa.h>
-#import <QuartzCore/QuartzCore.h>
+#import <QuartzCore/CVDisplayLink.h>
 
-@interface VideoCIView : NSOpenGLView
-{
-    CIContext		*_context;
-    CIImage			*_image;
-    BOOL			_needsReshape;
+
+@interface VideoGLView : NSOpenGLView {
+    CVDisplayLinkRef displayLink;
 }
 
-- (void)setImage:(CIImage *)image;
-- (CIContext*)ciContext;
-- (void)render;
+- (void)setImage:(CVImageBufferRef)img;
 @end
