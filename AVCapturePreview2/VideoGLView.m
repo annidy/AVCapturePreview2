@@ -14,6 +14,7 @@
 @interface VideoGLView()
 {
     OpenGLRenderer* _renderer;
+    CVImageBufferRef _image;
 }
 @end
 
@@ -26,9 +27,7 @@
     // because it will be called from a background thread.
     // It's important to create one or app can leak objects.
     @autoreleasepool {
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [self drawView];
-        });
+        [self drawView];
     }
     return kCVReturnSuccess;
 }
@@ -223,6 +222,10 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink,
     // simultaneously when resizing
     CGLLockContext([[self openGLContext] CGLContextObj]);
     
+    if (_image) {
+        [_renderer setImage:_image];
+        CFRelease(_image), _image = 0;
+    }
     [_renderer render];
     
     CGLFlushDrawable([[self openGLContext] CGLContextObj]);
@@ -240,8 +243,9 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink,
 }
 
 - (void)setImage:(CVImageBufferRef)img {
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        [_renderer setImage:img];
-    });
+    CGLLockContext([[self openGLContext] CGLContextObj]);
+    if (_image) CFRelease(_image);
+    _image = (CVImageBufferRef)CFRetain(img);
+    CGLUnlockContext([[self openGLContext] CGLContextObj]);
 }
 @end
